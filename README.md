@@ -1,4 +1,4 @@
-Here's how you can update your README to include the steps for calculating latitude and longitude from addresses, and then processing those coordinates into geohash values and target encoding them. This version also integrates your provided code for geocoding and processing geohashes.
+
 
 * * * * *
 
