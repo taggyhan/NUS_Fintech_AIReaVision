@@ -33,12 +33,12 @@ Usage
 ### 1\. Load the Model and StandardScaler
 
 
+```
+import joblib
 
-`import joblib
-
-model = joblib.load('model_filename.pkl')
+model = joblib.load('model_filename.pkl') #or whatever the name is
 scaler = joblib.load('scaler_filename.pkl')`
-
+```
 ### 2\. Geocoding Addresses
 
 Convert addresses into latitude and longitude for processing. This can be done using the following functions:
@@ -50,6 +50,7 @@ from geopy.extra.rate_limiter import RateLimiter
 import pandas as pd
 
 # Function to apply geocoding
+```
 def geocode_address(addr, geocode):
     try:
         location = geocode(f"{addr}, Singapore")
@@ -61,18 +62,29 @@ def geocode_address(addr, geocode):
         return pd.Series([None, None])
 
 # Function to process chunks of addresses
-def process_addresses(df, chunk_size=1000):
-    geolocator = Nominatim(user_agent="NUS_project")
-    geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
-    num_chunks = (len(df) // chunk_size) + (1 if len(df) % chunk_size != 0 else 0)
 
-    for i in range(num_chunks):
-        start_idx = i * chunk_size
-        end_idx = start_idx + chunk_size
-        chunk = df.iloc[start_idx:end_idx]
-        chunk[['Latitude', 'Longitude']] = chunk['Address'].apply(lambda x: geocode_address(x, geocode))
-        chunk.to_csv(f'geocoded_addresses_{start_idx}_{end_idx}.csv', index=False)
-        print(f"Processed and saved chunk {i+1}/{num_chunks} (rows {start_idx} to {end_idx})")`
+def process_addresses(df, chunk_size=1000):
+
+    geolocator = Nominatim(user_agent="NUS_project")
+
+    geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
+
+    num_chunks = (len(df) // chunk_size) + (1 if len(df) % chunk_size != 0 else 0)
+
+    for i in range(num_chunks):
+
+        start_idx = i * chunk_size
+
+        end_idx = start_idx + chunk_size
+
+        chunk = df.iloc[start_idx:end_idx]
+
+        chunk[['Latitude', 'Longitude']] = chunk['Address'].apply(lambda x: geocode_address(x, geocode))
+
+        chunk.to_csv(f'geocoded_addresses_{start_idx}_{end_idx}.csv', index=False)
+
+        print(f"Processed and saved chunk {i+1}/{num_chunks} (rows {start_idx} to {end_idx})")`
+```
 
 ### 3\. Encoding and Scaling Features
 
@@ -81,6 +93,7 @@ After geocoding, encode and scale your input features as follows:
 
 
 `# Assuming df is your DataFrame loaded with addresses
+```
 process_addresses(df)
 
 # Encode geohash and target encode
@@ -101,14 +114,14 @@ df = target_encode_geohash(df, target_col='Asking Price')
 # Scale numeric features
 numeric_cols = ['Bedrooms', 'Bathrooms', 'Size', 'Age', 'Years_Left', 'No. of Amenities', 'geohash_target_mean']
 df[numeric_cols] = scaler.transform(df[numeric_cols])`
-
+```
 ### 4\. Scale Numeric Features
 
 Before using the model for predictions, it's crucial to scale the numeric features to ensure that the model performs optimally. This is done using `StandardScaler` from Scikit-Learn.
 
 
-
-`from sklearn.preprocessing import StandardScaler
+```
+from sklearn.preprocessing import StandardScaler
 import joblib
 import pandas as pd
 
@@ -124,7 +137,7 @@ df[numeric_cols] = scaler.fit_transform(df[numeric_cols])
 
 # Save the scaler for future use
 joblib.dump(scaler, "scaler.joblib")`
-
+```
 This step ensures that the numeric features are normalized, making the training process more stable and improving the performance of most algorithms by equalizing the range of the data features.
 
 ### 5\. Prepare Model Inputs
@@ -148,14 +161,16 @@ Each district should be represented as a separate column (e.g., `District_1`, `D
 After preprocessing and scaling the data, load the trained machine learning model to make predictions:
 
 
-
-`import joblib
+```
+import joblib
 
 # Load the model
 model = joblib.load('model_filename.pkl')
 
 # Assuming that df is prepared with all necessary columns
 predictions = model.predict(df)
-
+```
 # Print the predictions
+```
 print("Predicted Prices:", predictions)`
+```
