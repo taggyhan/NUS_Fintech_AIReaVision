@@ -1,7 +1,3 @@
-
-
-* * * * *
-
 Property Price Prediction Model
 ===============================
 
@@ -34,14 +30,24 @@ Download the pretrained model and the `StandardScaler` object from the provided 
 Usage
 -----
 
-link to the model: <https://drive.google.com/file/d/1RQWkeXulEfwPFtIGi4vxkJsgXSohcAUF/view?usp=sharing> 
+### 1\. Load the Model and StandardScaler
 
-link to the scalar: <https://drive.google.com/file/d/1-1zIsoZpRvZloJy0zsb1Br7m6Nh7jSIl/view?usp=sharing>
+python
+
+Copy code
+
+`import joblib
+
+model = joblib.load('model_filename.pkl')
+scaler = joblib.load('scaler_filename.pkl')`
 
 ### 2\. Geocoding Addresses
 
 Convert addresses into latitude and longitude for processing. This can be done using the following functions:
 
+python
+
+Copy code
 
 `from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
@@ -76,7 +82,9 @@ def process_addresses(df, chunk_size=1000):
 
 After geocoding, encode and scale your input features as follows:
 
+python
 
+Copy code
 
 `# Assuming df is your DataFrame loaded with addresses
 process_addresses(df)
@@ -104,6 +112,9 @@ df[numeric_cols] = scaler.transform(df[numeric_cols])`
 
 Before using the model for predictions, it's crucial to scale the numeric features to ensure that the model performs optimally. This is done using `StandardScaler` from Scikit-Learn.
 
+python
+
+Copy code
 
 `from sklearn.preprocessing import StandardScaler
 import joblib
@@ -144,6 +155,9 @@ Each district should be represented as a separate column (e.g., `District_1`, `D
 
 After preprocessing and scaling the data, load the trained machine learning model to make predictions:
 
+python
+
+Copy code
 
 `import joblib
 
