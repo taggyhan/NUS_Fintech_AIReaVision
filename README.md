@@ -91,9 +91,9 @@ def process_addresses(df, chunk_size=1000):
 After geocoding, encode and scale your input features as follows:
 
 
-
-`# Assuming df is your DataFrame loaded with addresses
 ```
+# Assuming df is your DataFrame loaded with addresses
+
 process_addresses(df)
 
 # Encode geohash and target encode
@@ -121,7 +121,7 @@ Before using the model for predictions, it's crucial to scale the numeric featur
 
 
 ```
-from sklearn.preprocessing import StandardScaler
+
 import joblib
 import pandas as pd
 
@@ -129,8 +129,7 @@ import pandas as pd
 numeric_cols = ['Bedrooms', 'Bathrooms', 'Size', 'Age', 'Years_Left',
                 'No. of Amenities', 'geohash_target_mean']
 
-# Initialize the StandardScaler
-scaler = StandardScaler()
+# remember that scaler was built before
 
 # Fit and transform the data
 df[numeric_cols] = scaler.fit_transform(df[numeric_cols])
