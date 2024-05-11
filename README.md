@@ -17,7 +17,7 @@ The model uses the following input features for predictions:
 -   Number of Amenities: Numeric
 -   Latitude and Longitude: Numeric (calculated from address)
 -   District: One-hot encoded (District_1 to District_28)
--   Geohash Target Mean: Numeric (mean target variable per geohash)
+-   Spatial Density
 
 Model and StandardScaler
 ------------------------
@@ -96,24 +96,24 @@ After geocoding, encode and scale your input features as follows:
 
 process_addresses(df)
 
-# Encode geohash and target encode
-import geohash2
 
-def encode_geohash(df, lat_col='Latitude', lon_col='Longitude', precision=5):
-    df['geohash'] = df.apply(lambda x: geohash2.encode(x[lat_col], x[lon_col], precision=precision), axis=1)
+import pandas as pd
+from scipy.spatial import cKDTree
+import numpy as np
+def add_spatial_density(df, radius=0.0005):  # Adjust the radius based on your geographic context
+    # Convert latitude and longitude to radians for use in KDTree (which assumes spherical earth)
+    coords = np.radians(df[['Latitude', 'Longitude']].values)
+    tree = cKDTree(coords)
+    
+    # Query the KDTree to count neighbors within the specified radius
+    counts = tree.query_ball_point(coords, radius, return_length=True)
+    
+    # Add the counts as a new column to the dataframe
+    df['spatial_density'] = counts
     return df
 
-def target_encode_geohash(df, target_col):
-    geohash_target_mean = df.groupby('geohash')[target_col].mean().reset_index(name='geohash_target_mean')
-    df = df.merge(geohash_target_mean, how='left', on='geohash')
-    return df
 
-df = encode_geohash(df)
-df = target_encode_geohash(df, target_col='Asking Price')
 
-# Scale numeric features
-numeric_cols = ['Bedrooms', 'Bathrooms', 'Size', 'Age', 'Years_Left', 'No. of Amenities', 'geohash_target_mean']
-df[numeric_cols] = scaler.transform(df[numeric_cols])`
 ```
 ### 4\. Scale Numeric Features
 
@@ -127,7 +127,7 @@ import pandas as pd
 
 # Assuming df is your DataFrame and selecting numeric columns for scaling
 numeric_cols = ['Bedrooms', 'Bathrooms', 'Size', 'Age', 'Years_Left',
-                'No. of Amenities', 'geohash_target_mean']
+                'No. of Amenities', 'spatial_density']
 
 # remember that scaler was built before
 
@@ -151,7 +151,7 @@ Ensure that all required input features are correctly formatted and included in 
 -   Years Left (Numeric)
 -   Number of Amenities (Numeric)
 -   Districts 1-28 (One-hot Encoded)
--   Geohash Target Mean (Numeric)
+-   spatial_density (Numeric)
 
 Each district should be represented as a separate column (e.g., `District_1`, `District_2`, etc.), where each column is a binary flag indicating whether the property is in that district.
 
