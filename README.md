@@ -173,3 +173,7 @@ predictions = model.predict(df)
 ```
 print("Predicted Prices:", predictions)`
 ```
+
+# AppIntialization
+
+Refer to /app , credits to [Nancy and Rishit]([URL](https://github.com/hzxnancy/appForm/tree/main))
